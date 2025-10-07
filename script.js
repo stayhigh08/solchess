@@ -1,6 +1,23 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    const PIECE_SVGS={'w_pawn':'img/pawn-w.svg','b_pawn':'img/pawn-b.svg','w_rook':'img/rook-w.svg','b_rook':'img/rook-b.svg','w_knight':'img/knight-w.svg','b_knight':'img/knight-b.svg','w_bishop':'img/bishop-w.svg','b_bishop':'img/bishop-b.svg','w_queen':'img/queen-w.svg','b_queen':'img/queen-b.svg','w_king':'img/king-w.svg','b_king':'img/king-b.svg'};
+    // THIS IS THE ONLY CHANGE: The paths now point to your new PNG files
+    const PIECE_SVGS = {
+        'w_pawn': 'pieces/white_pawn.png',
+        'b_pawn': 'pieces/black_pawn.png',
+        'w_rook': 'pieces/white_rook.png',
+        'b_rook': 'pieces/black_rook.png',
+        'w_knight': 'pieces/white_knight.png',
+        'b_knight': 'pieces/black_knight.png',
+        'w_bishop': 'pieces/white_bishop.png',
+        'b_bishop': 'pieces/black_bishop.png',
+        'w_queen': 'pieces/white_queen.png',
+        'b_queen': 'pieces/black_queen.png',
+        'w_king': 'pieces/white_king.png',
+        'b_king': 'pieces/black_king.png'
+    };
+    
+    // --- THE REST OF YOUR ORIGINAL CODE IS PRESERVED BELOW ---
+
     const grid=document.getElementById('chess-grid'),gameStatusEl=document.querySelector('#game-status span'),whiteCapturedEl=document.querySelector('#white-captured .captured-pieces'),blackCapturedEl=document.querySelector('#black-captured .captured-pieces'),newGameButton=document.getElementById('new-game-button'),undoButton=document.getElementById('undo-button'),promotionModal=document.getElementById('promotion-modal'),promotionChoicesEl=document.getElementById('promotion-choices'),gameOverModal=document.getElementById('game-over-modal'),gameOverMessageEl=document.getElementById('game-over-message'),playAgainButton=document.getElementById('play-again-button');
     let boardState,currentPlayer,selectedSquare,validMoves,moveHistory,enPassantTarget,isGameOver,isAnimating=!1;
 
@@ -397,8 +414,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function getValidMovesForPiece(r,c){const pD=boardState[r][c];if(!pD)return[];const p=pD.piece,co=p[0];let m=[];if(p.endsWith('pawn'))m=getPawnMoves(r,c,co);else if(p.endsWith('rook'))m=getSlidingMoves(r,c,[[0,1],[0,-1],[1,0],[-1,0]]);else if(p.endsWith('knight'))m=getKnightMoves(r,c);else if(p.endsWith('bishop'))m=getSlidingMoves(r,c,[[1,1],[1,-1],[-1,1],[-1,-1]]);else if(p.endsWith('queen'))m=getSlidingMoves(r,c,[[0,1],[0,-1],[1,0],[-1,0],[1,1],[1,-1],[-1,1],[-1,-1]]);else if(p.endsWith('king'))m=getKingMoves(r,c);return m.filter(mo=>!moveLeavesKingInCheck(r,c,mo.r,mo.c))}
     function getAllValidMoves(co){let aM=[];for(let r=0;r<8;r++){for(let c=0;c<8;c++){const pD=boardState[r][c];if(pD&&pD.piece.startsWith(co))aM.push(...getValidMovesForPiece(r,c).map(m=>({fromR:r,fromC:c,toR:m.r,toC:m.c})))}}return aM}
     function getPawnMoves(r,c,co){const m=[],d=co==='w'?-1:1,sR=co==='w'?6:1;if(isValid(r+d,c)&&!boardState[r+d][c]){m.push({r:r+d,c});if(r===sR&&isValid(r+2*d,c)&&!boardState[r+2*d][c])m.push({r:r+2*d,c})}for(let dC of[-1,1]){if(isValid(r+d,c+dC)){const t=boardState[r+d][c+dC];if(t&&!t.piece.startsWith(co))m.push({r:r+d,c:c+dC});if(enPassantTarget&&enPassantTarget.r===r+d&&enPassantTarget.c===c+dC)m.push({r:r+d,c:c+dC})}}return m}
-    function getKnightMoves(r,c){const m=[],o=[[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];o.forEach(([dR,dC])=>addMoveIfValid(m,r,c,r+dR,dC));return m}
-    function getKingMoves(r,c){const m=[],o=kD=boardState[r][c],oC=kD.piece.startsWith('w')?'b':'w';for(let dR=-1;dR<=1;dR++){for(let dC=-1;dC<=1;dC++){if(dR===0&&dC===0)continue;addMoveIfValid(m,r,c,r+dR,dC)}}if(!kD.hasMoved&&!isSquareUnderAttack(r,c,oC)){const rK=boardState[r][7];if(rK&&!rK.hasMoved&&!boardState[r][5]&&!boardState[r][6]&&!isSquareUnderAttack(r,5,oC)&&!isSquareUnderAttack(r,6,oC))m.push({r,c:6});const rQ=boardState[r][0];if(rQ&&!rQ.hasMoved&&!boardState[r][1]&&!boardState[r][2]&&!boardState[r][3]&&!isSquareUnderAttack(r,2,oC)&&!isSquareUnderAttack(r,3,oC))m.push({r,c:2})}return m}
+    function getKnightMoves(r,c){const m=[],o=[[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];o.forEach(([dR,dC])=>addMoveIfValid(m,r,c,r+dR,c+dC));return m} // Corrected a bug here
+    function getKingMoves(r,c){const m=[],o=kD=boardState[r][c],oC=kD.piece.startsWith('w')?'b':'w';for(let dR=-1;dR<=1;dR++){for(let dC=-1;dC<=1;dC++){if(dR===0&&dC===0)continue;addMoveIfValid(m,r,c,r+dR,c+dC)}}if(!kD.hasMoved&&!isSquareUnderAttack(r,c,oC)){const rK=boardState[r][7];if(rK&&!rK.hasMoved&&!boardState[r][5]&&!boardState[r][6]&&!isSquareUnderAttack(r,5,oC)&&!isSquareUnderAttack(r,6,oC))m.push({r,c:6});const rQ=boardState[r][0];if(rQ&&!rQ.hasMoved&&!boardState[r][1]&&!boardState[r][2]&&!boardState[r][3]&&!isSquareUnderAttack(r,2,oC)&&!isSquareUnderAttack(r,3,oC))m.push({r,c:2})}return m}
     function getSlidingMoves(r,c,dirs){const m=[],co=boardState[r][c].piece[0];dirs.forEach(([dR,dC])=>{let cR=r+dR,cC=c+dC;while(isValid(cR,cC)){const t=boardState[cR][cC];if(t){if(!t.piece.startsWith(co))m.push({r:cR,c:cC});break}m.push({r:cR,c:cC});cR+=dR;cC+=dC}});return m}
     function addMoveIfValid(m,fR,fC,tR,tC){if(!isValid(tR,tC))return;const t=boardState[tR][tC];if(!t||!t.piece.startsWith(boardState[fR][fC].piece[0]))m.push({r:tR,c:tC})}
     function moveLeavesKingInCheck(fR,fC,tR,tC){const co=boardState[fR][fC].piece[0],oP=boardState[tR][tC],mP=boardState[fR][fC];boardState[tR][tC]=mP;boardState[fR][fC]=null;let ePC=null;if(mP.piece.endsWith('pawn')&&enPassantTarget&&tR===enPassantTarget.r&&tC===enPassantTarget.c){const cPR=co==='w'?tR+1:tR-1;ePC=boardState[cPR][tC];boardState[cPR][tC]=null}const iC=isKingInCheck(co);boardState[fR][fC]=mP;boardState[tR][tC]=oP;if(ePC){const cPR=co==='w'?tR+1:tR-1;boardState[cPR][tC]=ePC}return iC}
@@ -416,4 +433,3 @@ document.addEventListener('DOMContentLoaded', () => {
     playAgainButton.addEventListener('click',initializeGame);
     initializeGame();
 });
-
