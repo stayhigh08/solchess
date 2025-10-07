@@ -4,7 +4,7 @@
     --card-black: #1A1A1A;
     --grid-color: rgba(147, 112, 219, 0.05);
     --light-square: rgba(234, 234, 234, 0.1);
-    --dark-square: rgba(75, 0, 130, 0.2);
+    --dark-square: #4a096157;
     --highlight-color: rgba(255, 223, 0, 0.5);
     --check-color: rgba(255, 0, 0, 0.5);
     --cell-size: clamp(40px, 10vmin, 75px);
@@ -97,7 +97,7 @@ h1{font-size:clamp(2rem,8vw,3.5rem);font-weight:800;margin:0;color:#fff;letter-s
 .board{display:flex;flex-direction:column;align-items:center; position: relative;}
 .grid{display:grid;grid-template-columns:repeat(8,var(--cell-size));grid-template-rows:repeat(8,var(--cell-size));border-radius:8px;border:3px solid rgba(255,255,255,.2);box-shadow:0 10px 30px rgba(0,0,0,.4);overflow:hidden;background-image:url(board.svg);background-size:cover;background-position:center;position:relative}
 .square{display:flex;justify-content:center;align-items:center;cursor:pointer;position:relative;transition:background-color .2s;overflow:hidden}
-.square.light{background-color:var(--light-square)}
+.square.light{background-color:#3b1b033b}
 .square.dark{background-color:var(--dark-square)}
 .square::before{content:'';position:absolute;top:50%;left:50%;width:0;height:0;background:radial-gradient(circle,rgba(255,255,255,.25) 0,transparent 70%);border-radius:50%;transform:translate(-50%,-50%);transition:width .3s ease-out,height .3s ease-out;z-index:1}
 .square:hover::before{width:200%;height:200%}
